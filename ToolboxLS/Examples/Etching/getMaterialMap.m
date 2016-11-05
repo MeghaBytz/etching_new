@@ -22,7 +22,7 @@ if(options.horizontal) % horizontal stacks
     endMatInd = [endXIndices;endYIndices];
     map = [1 2 1 2 1];    
 else                    % vertical stacks
-    startXIndices = [-1 -.6 -.2 .2 .6];
+    startXIndices = [-2 -.6 -.2 .2 .6];
     endXIndices = [-.6 -.2  .2 .6 1];
     startYIndices = [1 1 1 1 1];
     endYIndices = [-1 -1 -1 -1 -1];
