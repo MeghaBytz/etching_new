@@ -1,0 +1,29 @@
+function data = rectangleIC(g)
+
+% data = rectangleIC(g)
+% g - grid
+
+p = (g.min + g.max)/3.0;
+q = 2*p;
+
+
+if( g.dim == 2 )
+    % in 2D hyperplane x=0 at (g.min+g.dx,0,0).
+    normal = [ -1.0; 0.0];
+    point  = [p(1);q(1)];
+    data = shapeHyperplane(g,normal,point); 
+    
+    normal = - normal;
+    point  = [p(2);q(2)];
+    data = max(data,shapeHyperplane(g,normal,point)); 
+    if( plane == 'x')
+        normal = [ 1.0; 0.0];
+        point  = [g.min(1) + grid_pos*g.dx(1);g.min(2)];
+    else
+        normal = [0.0;1.0];
+        point  = [g.min(1);g.min(2) + g.dx(2)];
+    end     
+else
+    disp('Fix rectangleIC.m for 3D');
+end
+data = shapeHyperplane(g,normal,point); 

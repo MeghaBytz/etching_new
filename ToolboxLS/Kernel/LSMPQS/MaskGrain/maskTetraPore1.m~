@@ -1,0 +1,26 @@
+function  [mask,g] = maskTetraPore1(g)
+
+% function  [mask,g] = maskTetraPore1(g)
+
+h = 0.6;
+h1 = 0.3;
+
+%throat radii
+r1 = 0.3
+r2 = 0.14
+r3 = 0.14
+r4 = 0.14
+
+p(:,1) = [g.min(1);0];
+p(:,2) = [-r1;h1];
+p(:,3) = [-r2; g.max(2)];
+
+[mask,g] = maskCorner(g,p);
+
+r = 0.14 %throat radius
+p(:,1) = [r2; g.max(2)];
+p(:,2) = [h1;h1];
+p(:,3) = [g.max(1);0];
+
+
+[mask,g] = maskCorner(g,p);

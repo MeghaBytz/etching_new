@@ -1,0 +1,9 @@
+function colors = getColors(map)
+
+nM
+
+colors = ['b'; 'r'; 'y'; 'g'; 'p'];
+
+colors = colors(1:nMaterials);
+
+end
