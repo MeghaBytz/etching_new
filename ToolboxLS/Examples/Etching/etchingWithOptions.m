@@ -135,14 +135,15 @@ end
 
 function [bottomWidth, centerHeight] = getEtchDims(g, data, mask, init_level)
 
-small = g.dx(1)/10;
 intfcPoints = isNearInterface(data);
 w = zeros(size(data,1),1);
 h = zeros(size(data,2),1);
 intfcPoints(mask >= 0) = 0;
 
 % locate index of initial level
-top_ind = find((g.xs{2,1}(1,:)-init_level) < small);
+top_ind = find(abs(g.xs{2,1}(1,:)-init_level) < g.dx(1));
+
+top_ind = top_ind(end);
 
 center = round(size(data,1)/2);
 for i = 1:size(data,1)

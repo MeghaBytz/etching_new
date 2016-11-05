@@ -43,7 +43,7 @@ material2 = [A2 B2 rxnProb2 SCl2 lambda1 lambda2 epsS2 epsD2 noise];
 algernonUnknowns = [material1; material2]
 %---------------------------------------------------------------------------
 % create options structure
-options = createOptionsDefault();
+[g, options] = createOptionsDefault();
 
 % set case for velocities
 options.etchShape = 'varyAlpha';
@@ -65,7 +65,7 @@ options.horizontal = 0;
 % get layer boundaries
 % boundaries must be set in getMaterialMap. Haven't figured out an easier
 % way yet
-[startMatInd, endMatInd, options.map] = getMaterialMap(g, options);
+[startMatInd, endMatInd, ~, options.map] = getMaterialMap(g, options);
 options.colors = getColors(options.map);
 options.layer_boundaries = cat(1,startMatInd,endMatInd);
 %---------------------------------------------------------------------------

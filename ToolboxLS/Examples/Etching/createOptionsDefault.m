@@ -21,7 +21,7 @@ options.horizontal = 0;
 % get layer boundaries
 % boundaries must be set in getMaterialMap. Haven't figured out an easier
 % way yet
-[startMatInd, endMatInd, options.map] = getMaterialMap(g,options);
+[startMatInd, endMatInd, ~, options.map] = getMaterialMap(g,options);
 options.colors = getColors(options.map);
 options.layer_boundaries = cat(1,startMatInd,endMatInd);
 %---------------------------------------------------------------------------
