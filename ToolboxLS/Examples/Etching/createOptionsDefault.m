@@ -1,6 +1,6 @@
 function [g, options] = createOptionsDefault()
 
-options.doMask = 0;
+options.doMask = 1;
 options.accuracy = 'medium';
 options.etchShape = 'rectangle';
 %---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ g = processGrid(g);
 % create geometry, layers and mask
 
 % set to zero for vertical stacks
-options.horizontal = 0;
+options.horizontal = 1;
 
 % get layer boundaries
 % boundaries must be set in getMaterialMap. Haven't figured out an easier
@@ -25,6 +25,13 @@ options.horizontal = 0;
 options.colors = getColors(options.map);
 options.layer_boundaries = cat(1,startMatInd,endMatInd);
 %---------------------------------------------------------------------------
+% Create sources - control visibility. Number of sources dictates number of
+% visibility matrices - these are in terms of grid dimensions, not matrix
+% coordinates. For more sources, add rows
+options.sources = [0, 1];
+
+%---------------------------------------------------------------------------
+
 % Plotting parameters
 % To plot or not to plot
 options.doDisplay = 1;

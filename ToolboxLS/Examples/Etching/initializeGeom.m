@@ -10,8 +10,7 @@ init_level = center(end)+widths(end)/2;
 
 %---------------------------------------------------------------------------
 % Create mask 
-% remove Mask for block copolymers by setting half_width and thickness equal
-% to zero
+
 if(options.doMask)
     half_width =0.1;
     thickness = 6*g.dx;
