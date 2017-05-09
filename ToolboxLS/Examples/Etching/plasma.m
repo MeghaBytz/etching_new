@@ -1,15 +1,16 @@
-function [Vx Vy] = plasma(current,i)
+function [Vx, Vy] = plasma(current,expNo)
+
+%  
+% %speed hack - presolved densities, Te, and Ti
+% densities = oxfordDensities;
+% Ti = oxfordTi;
+% Te = oxfordTe;
 global ee me MO MO2 ng Tg Ti l_p gammaO gammaO2m
 global Efactor_O2 Efactor_O EnergyO2 sigO2 EnergyO sigO
 global Krec Krec2 Krec3 Krec4 Kdet Kch Rlambda hl0 Rrec alphabar
 global pabs R area volume QtorrLit Qmolec Kpump scat_Xsec
-global numberOfIons
-global numberOfRadicals
 global expConditions
-global viewFactor
-global noUnknowns
 
-%expConditions = [6.02,4,0.5,100] %change this for experimental condition set
 ee=1.6022E-19;
 me=9.1095E-31; % mass of electron
 MO=1836*16*me; % mass of an Oxygen atom
@@ -17,31 +18,30 @@ MO2=2*MO; % mass of an Oxygen Molecule
 Tg=0.052; % 600K in volts
 Ti=Tg;
 gammaO2m=0.007;% wall recombination rate of meta-stable Oxygen
-R=0.08; % reactor radius
-L=0.075; % reactor length
+R=0.14; % Oxford plasma lab reactor radius
+L=0.06; % Oxford plasma lab reactor length
 l_p=L/2; % half length
 area=2*pi*R*(R+L); % total surface area
 volume=pi*R^2*L; % reactor volume
 Efactor_O=2+0.5*(1+log(MO/(2*pi*me))); % (E_e+E_i_O)/Te
 Efactor_O2=2+0.5*(1+log(MO2/(2*pi*me))); % (E_e+E_i_O2)/Te
 % Loading all cross-section data to calculate Kel & Ec
-load o2cross.txt -ASCII;
-EnergyO2 = o2cross(:,2);
-sigmaO2 = o2cross(:,3);
+load O2cross.txt -ASCII;
+EnergyO2 = O2cross(:,2);
+sigmaO2 = O2cross(:,3);
 sigO2 = sigmaO2 * 1e-20;
 load Ocross.txt -ASCII;
 EnergyO = Ocross(:,1);
 sigmaO = Ocross(:,2);
 sigO = sigmaO * 1e-20;
 % power input
-length(expConditions)
-Pabs=expConditions(i,4); % total absorbed power in watts [adjustable] 
+Pabs=expConditions(expNo,4); % total absorbed power in watts [adjustable] 
 pabs=Pabs/(ee*volume);
 % starting pressures in mTorr (180W)
 % atomic oxygen surface recombination rate
-gammaO=expConditions(i,3);
-p=expConditions(i,1);
-Qsccm=expConditions(i,2);
+gammaO=expConditions(expNo,3);
+p=expConditions(expNo,1);
+Qsccm=expConditions(expNo,2);
 QtorrLit=Qsccm/79.05; % sccm to Torr-Liter/sec
 Qmolec=4.483e17*Qsccm; % sccm to molecules/sec
 Kpump=2*QtorrLit/(p*volume); % Pumping Rate coefficient
@@ -88,7 +88,7 @@ final_nOminusbar=nOminusbar(end);
 n_Ominus_bar=final_nOminusbar*1e-6; % in cm^-3
 final_ne0=ne0(end);
 n_e0=final_ne0*1e-6; % in cm^-3
-n_e0_2=n_e0/1e10; 
+n_e0_2=n_e0/1e10;
 final_nObar=nObar(end);
 n_O_bar=final_nObar*1e-6; % in cm^-3
 final_nO2mbar=nO2mbar(end);
@@ -109,8 +109,8 @@ nOp_ratio=final_nOplusbar/(final_nO2plusbar+final_nOplusbar);
 % ylabel('n_{{O_2}^+}, n_{e0} (m^{-3})')
 % axis([0 inf 0 final_nO2plusbar*1.5])
 % title(['Flowrate=',num2str(Qsccm),'sccm, P_{abs}=',num2str(Pabs),...
-%  'W, p_0=',num2str(p),'mTorr, p_f=',num2str(round(final_p)),...
-%  'mTorr'])
+%  'W, p_0=',num2str(p),'mTorr, p_f=',num2str(round(final_p)),...
+%  'mTorr'])
 % subplot(7,1,2)
 % plot(t,nOplusbar)
 % ylabel('n_{O^+} (m^{-3})')
@@ -146,10 +146,8 @@ dO=sqrt(4*DO*l_p*(2-gammaO)/vbarO/gammaO + l_p^2);
 dO2m=sqrt(4*DO2m*l_p*(2-gammaO2m)/vbarO2m/gammaO2m + l_p^2);
 hAO=1/(1 + l_p*vbarO*gammaO/4/DO/(2-gammaO));
 hAO2m=1/(1 + l_p*vbarO2m*gammaO2m/4/DO2m/(2-gammaO2m)) ;
-vol_O=volume*(1 - l_p^2/(3*dO^2))*(1 - (2/3)*l_p^3/(R*dO^2)...
- + l_p^4/(6*R^2*dO^2));
-vol_O2m=volume*(1 - l_p^2/(3*dO2m^2))*(1 - (2/3)*l_p^3/(R*dO2m^2)...
- + l_p^4/(6*R^2*dO2m^2));
+vol_O=volume*(1 - l_p^2/(3*dO^2))*(1 - (2/3)*l_p^3/(R*dO^2)+ l_p^4/(6*R^2*dO^2));
+vol_O2m=volume*(1 - l_p^2/(3*dO2m^2))*(1 - (2/3)*l_p^3/(R*dO2m^2)+ l_p^4/(6*R^2*dO2m^2));
 vr_O=vol_O/volume;
 vr_O2m=vol_O2m/volume;
 % calculation of the final alpha0
@@ -186,10 +184,8 @@ n_O2m=final_nO2m*1e-6; % in cm^-3
 Mplus_dw=MO2*(1-nOp_ratio)+MO*nOp_ratio;
 nstarf=15/56*sqrt(8*ee*Tplusf/pi/Mplus_dw)*(etaf^2)/(Krec_dw_f*lambda);
 hpar2f=hl0*1/(1+alpha0);
-hpar1f=1/(gamma_minusf^0.5 + (gamma_plusf^0.5)...
- *(etaf*l_p/sqrt(2*pi)/lambda))*(alpha0/(1+alpha0));
-hflat1f=1/(gamma_minusf^0.5 + (gamma_plusf^0.5)*(nstarf^0.5)...
- /(final_nOminus^0.5));
+hpar1f=1/(gamma_minusf^0.5 + (gamma_plusf^0.5)*(etaf*l_p/sqrt(2*pi)/lambda))*(alpha0/(1+alpha0));
+hflat1f=1/(gamma_minusf^0.5 + (gamma_plusf^0.5)*(nstarf^0.5)/(final_nOminus^0.5));
 %overall hl factor by "linear ansatz"
 final_hl=hpar2f + hpar1f + hflat1f;
 % size of EN core (lminus & rminus)
@@ -199,9 +195,7 @@ final_rminus=R - l_p + final_lminus; %in m
 Rminus=final_rminus*1e2; % in cm
 lminus_over_l_p=final_lminus/l_p;
 vratio=volumeminus/volume;
-vol_rec=(2*pi*final_lminus/(1+alpha0))*(8/15*alpha0*...
- (final_rminus^2 - 14/15*final_rminus*final_lminus...
- + 4/15*final_lminus^2) + 2/3*(final_rminus^2 - 2/3*final_rminus*final_lminus + 1/6*final_lminus^2)); 
+vol_rec=(2*pi*final_lminus/(1+alpha0))*(8/15*alpha0*(final_rminus^2 - 14/15*final_rminus*final_lminus+ 4/15*final_lminus^2) + 2/3*(final_rminus^2 - 2/3*final_rminus*final_lminus + 1/6*final_lminus^2));
 vrec_ratio=vol_rec/volume;
 % ion flux
 % final_nplus=final_nOminus + final_ne0;
@@ -210,7 +204,6 @@ vrec_ratio=vol_rec/volume;
 % final_nO=final_nObar*volume/vol_O;
 % final_nO2m=final_nO2mbar*volume/vol_O2m;
 dissociation_rate = final_nObar/final_ng;
-
 %need to make these calculations general
 nplus_flux=final_hl*final_nplus*final_uB_dw*1e-4 % in /cm^2/s
 nOplus_flux=final_hl*final_nOplus*final_uB_dw*1e-4 % in /cm^2/s
@@ -219,22 +212,9 @@ nO_flux=hAO*final_nO*vbarO/4*1e-4 % in /cm^2/s
 nO2m_flux=hAO*final_nO2m*vbarO2m/4*1e-4; % in /cm^2/s
 flux_ratio=nO_flux/nplus_flux;
 lambda_cm=lambda/1e-2; % in cm
-
 densities = [ final_nO2m final_nO final_nOplus final_nO2plus ]
-assignin('base', 'densities', densities)
-[Vx Vy] = calcVelocities(densities, final_Ti,final_Te,current); %divide by 100 to normalize for grid that goes crom -100 to 100
+[Vx, Vy] = calcVelocities(densities, final_Ti,final_Te,current);
 %fluxes = [nO2plus_flux nOplus_flux nO_flux nO2m_flux]
 
-%Calculate etch rate
-%etchRate = calcEtchRate(final_Te,fluxes, current)
-% save results
-% allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
-%  n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...
-%  n_Ominus_bar;n_O_bar;n_O2m_bar;n_O2;final_Te;final_Ec_O2;...
-%  final_Ec_O; alpha0;alphabar;gamma_plusf;final_hl;...
-%  lminus_over_l_p;Rminus;Lminus;vratio;vrec_ratio;...
-%  lambda_cm;dissociation_rate;nplus_flux;nO_flux;flux_ratio];
 
-% save results to a file
-% filename=[num2str(Pabs),'W_results.txt']
-% save(filename,'allresults','-ASCII','-double'); 
+
